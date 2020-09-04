@@ -93,9 +93,11 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    #install_requires=[
-    #    'numpy>=1.12',
-    #    'scipy>=0.17'],
+    install_requires=[
+        'numpy>=1.12',
+        'pyteomics>=4.3.2',
+        'psims>=0.1.31',
+        'scipy>=0.17'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
