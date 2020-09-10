@@ -1,5 +1,5 @@
-SPYMSI: Simple Python Mass-Spectrometry interface
-=================================================
+SIMSALABIM: Simple Interface for MS Applications
+================================================
 
 Requirements
 ------------
@@ -14,13 +14,13 @@ Installation via ``pip``
 
 ::
 
-  pip install spymsi
+  pip install simsalabim
 
 Installation from source
 ************************
 
 ::
 
-  git clone https://github.com/MatthewThe/spymsi.git
-  cd spymsi
+  git clone https://github.com/MatthewThe/simsalabim.git
+  cd simsalabim
   pip install .

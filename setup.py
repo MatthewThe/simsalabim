@@ -1,13 +1,13 @@
 # coding=utf-8
 
-"""setup.py: setuptools control for spymsi."""
+"""setup.py: setuptools control for simsalabim."""
 
 import re
 from setuptools import setup, find_packages
 
 version = re.search(
     '^__version__\s*=\s*"(.*)"',
-    open('spymsi/spymsi.py').read(),
+    open('simsalabim/simsalabim.py').read(),
     re.M).group(1)
 
 from codecs import open
@@ -24,19 +24,19 @@ setup(
     # package, this name will be registered for you. It will determine how
     # users can install this project, e.g.:
     #
-    # $ pip install spymsi
+    # $ pip install simsalabim
     #
 
-    name='spymsi',  # Required
+    name='simsalabim',  # Required
     version=version,  # Required
-    packages = ["spymsi"],
+    packages = ["simsalabim"],
     entry_points = {
-        "console_scripts": ['spymsi = spymsi.spymsi:main']
+        "console_scripts": ['simsalabim = simsalabim.simsalabim:main']
     },
 
     description='A simple python mass-spectrometry interface',  # Required
     long_description=long_description,  # Optional
-    url='https://github.com/MatthewThe/spymsi',  # Optional
+    url='https://github.com/MatthewThe/simsalabim',  # Optional
     author='Matthew The, KTH',  # Optional
     author_email='matthewt@kth.se',  # Optional
     maintainer='Matthew The, KTH',  # Optional
