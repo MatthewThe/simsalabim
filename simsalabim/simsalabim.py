@@ -1,10 +1,10 @@
 from __future__ import print_function
 
 __version__ = "0.1.0"
-__copyright__ = '''Copyright (c) 2019 Matthew The. All rights reserved.
-Written by Matthew The (matthewt@kth.se) in the
-School of Engineering Sciences in Chemistry, Biotechnology and Health at the 
-Royal Institute of Technology in Stockholm.'''
+__copyright__ = '''Copyright (c) 2020 Matthew The. All rights reserved.
+Written by Matthew The (matthew.the@tum.de) in the
+Chair of Proteomics and Bioanalytics at the 
+Technical University of Munich.'''
 
 import sys
 import os

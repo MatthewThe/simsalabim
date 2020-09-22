@@ -3,18 +3,13 @@ from __future__ import print_function
 import sys
 import os
 import csv
-import xml
 import copy
 import re
 
 import numpy
 from psims.transform.mzml import MzMLTransformer
 
-__version__ = "0.1.0"
-__copyright__ = '''Copyright (c) 2018-2020 Matthew The. All rights reserved.
-Written by Matthew The (matthew.the@scilifelab.se) in the
-School of Engineering Sciences in Chemistry, Biotechnology and Health at the 
-Royal Institute of Technology in Stockholm.'''
+from .simsalabim import __version__, __copyright__
 
 def main(argv):
   print('add-quant-info version %s\n%s' % (__version__, __copyright__))
@@ -112,7 +107,12 @@ def transformSpectra(features, fmz_all, mzml_fn, ms2_outpath, params):
     specPrecMapWriter = None
   
   mzml_fn_base = os.path.basename(mzml_fn)
-  with openVersionSafe(ms2_outpath, 'w') as out:
+  
+  writeMode = 'w'
+  if ms2_outpath.lower().endswith(".mzml"):
+    writeMode = 'wb'
+  
+  with openVersionSafe(ms2_outpath, writeMode) as out:
     trans = MzMLTransformerMultiOut(mzml_fn, out, transform = lambda x : transform(x, features, fmz_all, specPrecMapWriter, mzml_fn_base), transform_description = "Assigned accurate precursor information from Dinosaur")
     if ms2_outpath.lower().endswith(".mzml"):
       trans.write()
@@ -241,7 +241,10 @@ def precMassFromPrecMz(pmz, z):
 def openVersionSafe(filename, flag):
   # Python 3
   if sys.version_info[0] >= 3:
-    return open(filename, flag, newline = '')
+    if 'b' in flag:
+      return open(filename, flag)
+    else:
+      return open(filename, flag, newline = '')
   # Python 2
   else:
     return open(filename, flag + 'b')

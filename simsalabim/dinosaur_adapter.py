@@ -4,16 +4,11 @@ import sys
 import os
 import subprocess
 
+from .simsalabim import __version__, __copyright__
 from . import add_quant_info as quant
 
-__version__ = "0.1.0"
-__copyright__ = '''Copyright (c) 2018-2020 Matthew The. All rights reserved.
-Written by Matthew The (matthew.the@scilifelab.se) in the
-School of Engineering Sciences in Chemistry, Biotechnology and Health at the 
-Royal Institute of Technology in Stockholm.'''
-
 def main(argv):
-  print('dinosaur-batch version %s\n%s' % (__version__, __copyright__))
+  print('dinosaur-adapter version %s\n%s' % (__version__, __copyright__))
   print('Issued command:', os.path.basename(__file__) + " " + " ".join(map(str, sys.argv[1:])))
   
   args, params = parseArgs()
@@ -46,6 +41,10 @@ def parseArgs():
   apars.add_argument('--dinosaur_mem', default=8.0, metavar='M', type=float,
                      help='''Memory for allocated for Dinosaur in GB.
                           ''')
+  
+  apars.add_argument('--dinosaur_flags', default="", metavar='O', 
+                     help='''Extra command line flags to pass to Dinosaur, as indicated in Dinosaur's help text.
+                          ''')                        
                                                   
   apars.add_argument('--spectrum_output_format', default=None, metavar='F', 
                      help='''If you want updated spectrum files with the new MS1 features assigned to the MS2 spectra, set this to the desired output format (ms2, mgf or mzML).
@@ -76,6 +75,7 @@ def parseArgs():
   params = dict()
   params['splitPrecursors'] = args.split_precursors
   params['dinosaurMemory'] = args.dinosaur_mem
+  params['dinosaurFlags'] = args.dinosaur_flags
   
   return args, params
 
@@ -86,7 +86,7 @@ def run_dinosaur(dinosaur_jar_path, mzml_fns, output_folder, spectrum_output_for
     baseFN = getBase(getFileName(mzml_fn))
     dinosaur_output_file = os.path.join(output_folder, baseFN + ".features.tsv")
     if not os.path.isfile(dinosaur_output_file):
-      cmd_dinosaur = "%s --force --outDir=%s %s;" % (dinosaur_binary, output_folder, mzml_fn)
+      cmd_dinosaur = "%s --force --outDir=%s %s %s;" % (dinosaur_binary, output_folder, params['dinosaurFlags'], mzml_fn)
       executeCmd(cmd_dinosaur)
     else:
       print("Found dinosaur output file at %s, remove this file to re-run Dinosaur on this file" % (dinosaur_output_file))
