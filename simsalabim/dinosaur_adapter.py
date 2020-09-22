@@ -6,6 +6,7 @@ import subprocess
 
 from .simsalabim import __version__, __copyright__
 from . import add_quant_info as quant
+from . import helpers
 
 def main(argv):
   print('dinosaur-adapter version %s\n%s' % (__version__, __copyright__))
@@ -81,13 +82,13 @@ def parseArgs():
 
 def run_dinosaur(dinosaur_jar_path, mzml_fns, output_folder, spectrum_output_format, params):
   dinosaur_binary = "java -Xmx%dM -jar %s --seed=1" % (int(params['dinosaurMemory']*1000), dinosaur_jar_path)
-  createDir(output_folder)
+  helpers.createDir(output_folder)
   for mzml_fn in mzml_fns:
-    baseFN = getBase(getFileName(mzml_fn))
+    baseFN = helpers.getBase(helpers.getFileName(mzml_fn))
     dinosaur_output_file = os.path.join(output_folder, baseFN + ".features.tsv")
     if not os.path.isfile(dinosaur_output_file):
       cmd_dinosaur = "%s --force --outDir=%s %s %s;" % (dinosaur_binary, output_folder, params['dinosaurFlags'], mzml_fn)
-      executeCmd(cmd_dinosaur)
+      helpers.executeCmd(cmd_dinosaur)
     else:
       print("Found dinosaur output file at %s, remove this file to re-run Dinosaur on this file" % (dinosaur_output_file))
     
@@ -102,34 +103,7 @@ def run_dinosaur(dinosaur_jar_path, mzml_fns, output_folder, spectrum_output_for
         os.remove(output_fn)
     else:
       print("Found dinosaur mapping file at %s, remove this file to re-run Dinosaur on this file" % (params['specPrecMapFile']))
-
-def executeCmd(cmd):
-  print(cmd)
-  print("")
-  sys.stdout.flush()
-  rc = subprocess.call(cmd, shell=True)
-  #rc = 0
-  if rc == 1:
-    print("Error while processing " + cmd)
-    return 1
-  else:
-    return 0
-
-def createDir(directory):
-  if not os.path.isdir(directory):
-    os.makedirs(directory)
-    
-def getBase(filename):
-  return ".".join(filename.split(".")[:-1])
-
-def getExt(filename):
-  return filename.split(".")[-1]
-  
-def getFileFolder(filepath):
-  return "/".join(filepath.split("/")[:-1])  
-
-def getFileName(filepath):
-  return filepath.split("/")[-1]
+ 
     
 if __name__ == '__main__':
   main(sys.argv[1:])

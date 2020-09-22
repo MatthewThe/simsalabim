@@ -6,10 +6,11 @@ import csv
 import copy
 import re
 
-import numpy
+import numpy as np
 from psims.transform.mzml import MzMLTransformer
 
 from .simsalabim import __version__, __copyright__
+from . import helpers
 
 def main(argv):
   print('add-quant-info version %s\n%s' % (__version__, __copyright__))
@@ -63,7 +64,7 @@ def parseArgs():
   
 def load_feature_table(fn):
   table = []
-  with openVersionSafe(fn, 'r') as fh:
+  with helpers.openVersionSafe(fn, 'r') as fh:
     rd = csv.reader(fh, delimiter=',')
     for row in rd:
       if row[0] == 'FEATURE':
@@ -74,7 +75,7 @@ def load_feature_table(fn):
 
 def load_dinosaur_table(fn, minCharge=1):
   table = []
-  with openVersionSafe(fn, 'r') as fh:
+  with helpers.openVersionSafe(fn, 'r') as fh:
     rd = csv.reader(fh, delimiter='\t')
     for row in rd:
       if row[0] != 'mz':
@@ -91,7 +92,7 @@ def add_accurate_precursors(feature_fn, mzml_fn, ms2_outpath, params):
   else:
     features = load_feature_table(feature_fn)
   features.sort(key=lambda x: x[0])
-  fmz_all = numpy.array([f[0] for f in features])
+  fmz_all = np.array([f[0] for f in features])
 
   if ms2_outpath and not ms2_outpath.endswith(".dummy.txt") and not (ms2_outpath.lower().endswith(".ms2") or ms2_outpath.lower().endswith(".mzml") or ms2_outpath.lower().endswith(".mgf")):
     sys.exit("ERROR: Could not detect output format from filename. Please use the extension .mzML, .ms2 or .mgf for your output file")  
@@ -101,7 +102,7 @@ def add_accurate_precursors(feature_fn, mzml_fn, ms2_outpath, params):
 def transformSpectra(features, fmz_all, mzml_fn, ms2_outpath, params):
   transform = replace_precursors_multi_out if params['splitPrecursors'] else replace_precursors
   if len(params['specPrecMapFile']) > 0:
-    specPrecMapWriter = openVersionSafe(params['specPrecMapFile'], 'w')
+    specPrecMapWriter = helpers.openVersionSafe(params['specPrecMapFile'], 'w')
     specPrecMapWriter.write('FileName\tScanNr\tPrecMz\tCharge\tRTime\tIntensity\n')
   else:
     specPrecMapWriter = None
@@ -112,7 +113,7 @@ def transformSpectra(features, fmz_all, mzml_fn, ms2_outpath, params):
   if ms2_outpath.lower().endswith(".mzml"):
     writeMode = 'wb'
   
-  with openVersionSafe(ms2_outpath, writeMode) as out:
+  with helpers.openVersionSafe(ms2_outpath, writeMode) as out:
     trans = MzMLTransformerMultiOut(mzml_fn, out, transform = lambda x : transform(x, features, fmz_all, specPrecMapWriter, mzml_fn_base), transform_description = "Assigned accurate precursor information from Dinosaur")
     if ms2_outpath.lower().endswith(".mzml"):
       trans.write()
@@ -232,23 +233,6 @@ def get_candidate_precursors(features, fmz_all, pmz, iso_width_lower, iso_width_
       candidates.append(f)
   return candidates
 
-def precMzFromPrecMass(pmass, z):
-  return (float(pmass) + 1.00727646677 * (int(z) - 1)) / int(z)
-
-def precMassFromPrecMz(pmz, z):
-  return pmz * z - 1.00727646677 * (z - 1)
-
-def openVersionSafe(filename, flag):
-  # Python 3
-  if sys.version_info[0] >= 3:
-    if 'b' in flag:
-      return open(filename, flag)
-    else:
-      return open(filename, flag, newline = '')
-  # Python 2
-  else:
-    return open(filename, flag + 'b')
-
 def getScanNr(specId):
   return int(specId.split('scan=')[-1].split()[0])
 
@@ -328,7 +312,7 @@ class Ms2Writer:
           self.ms2_writer.write("I\tRTime\t%f\n" % (scan_start_time['value'] / timescale))
           written_scan_number = True
         
-        fmass = precMassFromPrecMz(p['mz'], p['charge'])
+        fmass = helpers.precMassFromPrecMz(p['mz'], p['charge'])
         if p['intensity']:
           self.ms2_writer.write("I\tEZ\t%d\t%f\t%f\t%f\n" % (p['charge'], fmass, scan_start_time['value'] / timescale, p['intensity']))
         self.ms2_writer.write("Z\t%d\t%f\n" % (p['charge'], fmass))
@@ -364,7 +348,7 @@ class MgfWriter:
         timescale = 60
       
       p = precursor_information[0]
-      fmass = precMassFromPrecMz(p['mz'], p['charge'])
+      fmass = helpers.precMassFromPrecMz(p['mz'], p['charge'])
       idx = getScanNr(id)
       self.mgf_writer.write("BEGIN IONS\n")
       self.mgf_writer.write("TITLE=%s\n" % id)

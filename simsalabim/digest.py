@@ -105,7 +105,7 @@ def getDigestedPeptides(seq, min_len = 6, max_len = 50, pre = ['K', 'R'], not_po
   if digestion == 'none':
     for i in range(lenS + 1):
       for j in range(i + min_len, i + max_len + 1):
-        if j < lenS:
+        if j <= lenS:
           yield seq[i:j]
   elif digestion == 'semi':
     for i in range(lenS + 1):
