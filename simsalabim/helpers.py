@@ -1,3 +1,4 @@
+import sys
 import os
 import subprocess
 
@@ -45,6 +46,9 @@ def getFileName(filepath):
   return os.path.basename(filepath)
   
 ### MS helpers ###
+
+def getScanNr(specId):
+  return int(specId.split('scan=')[-1].split()[0])
 
 def precMzFromPrecMass(pmass, z):
   return (float(pmass) + 1.00727646677 * (int(z) - 1)) / int(z)

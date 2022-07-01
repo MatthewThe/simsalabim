@@ -7,10 +7,10 @@ import copy
 import re
 
 import numpy as np
-from psims.transform.mzml import MzMLTransformer
 
 from .simsalabim import __version__, __copyright__
 from . import helpers
+from .transform import MzMLTransformerMultiOut
 
 def main(argv):
   print('add-quant-info version %s\n%s' % (__version__, __copyright__))
@@ -169,7 +169,7 @@ def replace_precursors_multi_out(spectrum, features, fmz_all, specPrecMapWriter,
             spectrum_copy = spectrum.copy()
             spectrum_copy["precursorList"] = spectrum["precursorList"].copy()
             
-            originalScanNr = getScanNr(spectrum_copy["id"])
+            originalScanNr = helpers.getScanNr(spectrum_copy["id"])
             newScanNr = originalScanNr*100+precIdx+1
             spectrum_copy["id"] = replaceScanNr(spectrum_copy["id"], str(newScanNr) + " originalScan=" + str(originalScanNr))
             #spectrum_copy["id"] += " precursorIdx=" + str(precIdx+1)
@@ -233,9 +233,6 @@ def get_candidate_precursors(features, fmz_all, pmz, iso_width_lower, iso_width_
       candidates.append(f)
   return candidates
 
-def getScanNr(specId):
-  return int(specId.split('scan=')[-1].split()[0])
-
 def replaceScanNr(specId, newScanNr):
   return re.sub(r'scan=([0-9]*)', 'scan=%s' % newScanNr, specId)
 
@@ -243,124 +240,7 @@ def writeSpecPrecRow(specPrecMapWriter, specId, f, mzml_fn_base):
   if specPrecMapWriter:
     fmz, fz, _, _, frt, fint = f
     specPrecMapWriter.write("%s\t%s\t%f\t%d\t%f\t%f\n" % (mzml_fn_base, specId, fmz, fz, frt, fint))
-  
-class MzMLTransformerMultiOut(MzMLTransformer):
-  def write(self):
-    '''Write out the the transformed mzML file
-    '''
-    writer = self.writer
-    with writer:
-      writer.controlled_vocabularies()
-      self.copy_metadata()
-      with writer.run(id="transformation_run"):
-        with writer.spectrum_list(len(self.reader._offset_index)):
-          self.reader.reset()
-          for i, spectrum in enumerate(self.iterspectrum()):
-            spectra = self.transform(spectrum)
-            for spectrum in spectra:
-              self.writer.write_spectrum(**self.format_spectrum(spectrum))
-            if i % 1000 == 0:
-              self.log("Handled %d spectra" % (i, ))
-  
-  def transform_only(self):
-    for i, spectrum in enumerate(self.iterspectrum()):
-      spectra = self.transform(spectrum)
-      if i % 1000 == 0:
-        self.log("Handled %d spectra" % (i, ))
-        
-  def write_ms2(self):
-    writer = Ms2Writer(self.output_stream)
-    writer.write_ms2_headers()
-    for i, spectrum in enumerate(self.iterspectrum()):
-      spectra = self.transform(spectrum)
-      for spectrum in spectra:
-        if spectrum['ms level'] == 2:
-          writer.write_ms2_spectrum(**self.format_spectrum(spectrum))
-      if i % 1000 == 0:
-        self.log("Handled %d spectra" % (i, ))
-  
-  def write_mgf(self):
-    writer = MgfWriter(self.output_stream)
-    for i, spectrum in enumerate(self.iterspectrum()):
-      spectra = self.transform(spectrum)
-      for spectrum in spectra:
-        if spectrum['ms level'] == 2:
-          writer.write_mgf_spectrum(**self.format_spectrum(spectrum))
-      if i % 1000 == 0:
-        self.log("Handled %d spectra" % (i, ))
 
-class Ms2Writer:
-  def __init__(self, output_stream):
-    self.ms2_writer = output_stream
-      
-  def write_ms2_spectrum(self, mz_array=None, intensity_array=None, charge_array=None, id=None,
-       polarity='positive scan', centroided=True, precursor_information=None,
-       scan_start_time=None, params=None, compression=None,
-       encoding=None, other_arrays=None, scan_params=None, scan_window_list=None,
-       instrument_configuration_id=None, intensity_unit=None):
-    if precursor_information:
-      # in the MS2 format retention times are in minutes
-      timescale = 1
-      if scan_start_time['unit_name'] == "second":
-        timescale = 60
-      
-      written_scan_number = False
-      for p in precursor_information:
-        if not written_scan_number:
-          idx = getScanNr(id)
-          self.ms2_writer.write("S\t%d\t%d\t%f\n" % (idx, idx, p['mz']))
-          self.ms2_writer.write("I\tRTime\t%f\n" % (scan_start_time['value'] / timescale))
-          written_scan_number = True
-        
-        fmass = helpers.precMassFromPrecMz(p['mz'], p['charge'])
-        if p['intensity']:
-          self.ms2_writer.write("I\tEZ\t%d\t%f\t%f\t%f\n" % (p['charge'], fmass, scan_start_time['value'] / timescale, p['intensity']))
-        self.ms2_writer.write("Z\t%d\t%f\n" % (p['charge'], fmass))
-      
-      if written_scan_number:
-        for a, b in zip(mz_array, intensity_array):
-          self.ms2_writer.write("%f %f\n" % (a, b))
-    
-  def write_ms2_headers(self):
-    from datetime import datetime
-    
-    self.ms2_writer.write("H\tCreationDate\t%s\n" % str(datetime.now()))
-    self.ms2_writer.write("H\tExtractor\t%s\n" % os.path.basename(__file__))
-    self.ms2_writer.write("H\tExtractorVersion\t1.0\n")
-    self.ms2_writer.write("H\tComments\t%s written by Matthew The, 2019\n" % os.path.basename(__file__))
-    self.ms2_writer.write("H\tExtractorOptions\tN/A\n")
-
-class MgfWriter:
-  def __init__(self, output_stream):
-    self.mgf_writer = output_stream
-      
-  def write_mgf_spectrum(self, mz_array=None, intensity_array=None, charge_array=None, id=None,
-       polarity='positive scan', centroided=True, precursor_information=None,
-       scan_start_time=None, params=None, compression=None,
-       encoding=None, other_arrays=None, scan_params=None, scan_window_list=None,
-       instrument_configuration_id=None, intensity_unit=None):
-    if precursor_information:
-      if len(precursor_information) != 1:
-        sys.exit("ERROR: cannot have 0 or multiple precursors for one spectrum in MGF format.")
-      
-      timescale = 1
-      if scan_start_time['unit_name'] == "minute":
-        timescale = 60
-      
-      p = precursor_information[0]
-      fmass = helpers.precMassFromPrecMz(p['mz'], p['charge'])
-      idx = getScanNr(id)
-      self.mgf_writer.write("BEGIN IONS\n")
-      self.mgf_writer.write("TITLE=%s\n" % id)
-      self.mgf_writer.write("PEPMASS=%f %f\n" % (fmass, p['intensity']))
-      self.mgf_writer.write("RTINSECONDS=%f\n" % (scan_start_time['value']*timescale))
-      self.mgf_writer.write("CHARGE=%d+\n" % (p['charge']))
-      self.mgf_writer.write("SCANS=%d\n" % (idx))
-      
-      for a, b in zip(mz_array, intensity_array):
-        self.mgf_writer.write("%f %f\n" % (a, b))
-      
-      self.mgf_writer.write("END IONS\n")
   
 if __name__ == '__main__':
   main(sys.argv[1:])
