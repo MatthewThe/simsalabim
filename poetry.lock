@@ -1,0 +1,130 @@
+[[package]]
+name = "greenlet"
+version = "1.1.2"
+description = "Lightweight in-process concurrent programming"
+category = "main"
+optional = false
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
+
+[package.extras]
+docs = ["sphinx"]
+
+[[package]]
+name = "lxml"
+version = "4.9.1"
+description = "Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API."
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, != 3.4.*"
+
+[package.extras]
+cssselect = ["cssselect (>=0.7)"]
+html5 = ["html5lib"]
+htmlsoup = ["beautifulsoup4"]
+source = ["Cython (>=0.29.7)"]
+
+[[package]]
+name = "numpy"
+version = "1.23.1"
+description = "NumPy is the fundamental package for array computing with Python."
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[[package]]
+name = "psims"
+version = "1.0.1"
+description = "Writers and controlled vocabulary manager for PSI-MS's mzML and mzIdentML standards"
+category = "main"
+optional = false
+python-versions = ">3.8"
+
+[package.dependencies]
+lxml = "*"
+numpy = "*"
+six = "*"
+sqlalchemy = "*"
+
+[package.extras]
+all = ["h5py", "hdf5plugin", "pynumpress"]
+mzmlb = ["h5py", "hdf5plugin"]
+numpress = ["pynumpress"]
+
+[[package]]
+name = "pyteomics"
+version = "4.5.3"
+description = "A framework for proteomics data analysis."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+df = ["pandas"]
+tda = ["numpy"]
+unimod = ["lxml", "sqlalchemy"]
+xml = ["lxml", "numpy"]
+all = ["lxml", "numpy", "matplotlib", "pandas", "sqlalchemy", "pynumpress", "h5py", "hdf5plugin", "psims (>v0.1.42)"]
+graphics = ["matplotlib"]
+mzmlb = ["h5py", "hdf5plugin"]
+numpress = ["pynumpress"]
+proforma = ["psims (>v0.1.42)"]
+
+[[package]]
+name = "six"
+version = "1.16.0"
+description = "Python 2 and 3 compatibility utilities"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
+
+[[package]]
+name = "sqlalchemy"
+version = "1.4.39"
+description = "Database Abstraction Library"
+category = "main"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7"
+
+[package.dependencies]
+greenlet = {version = "!=0.4.17", markers = "python_version >= \"3\" and (platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\")"}
+
+[package.extras]
+aiomysql = ["greenlet (!=0.4.17)", "aiomysql"]
+aiosqlite = ["typing_extensions (!=3.10.0.1)", "greenlet (!=0.4.17)", "aiosqlite"]
+asyncio = ["greenlet (!=0.4.17)"]
+asyncmy = ["greenlet (!=0.4.17)", "asyncmy (>=0.2.3,!=0.2.4)"]
+mariadb_connector = ["mariadb (>=1.0.1)"]
+mssql = ["pyodbc"]
+mssql_pymssql = ["pymssql"]
+mssql_pyodbc = ["pyodbc"]
+mypy = ["sqlalchemy2-stubs", "mypy (>=0.910)"]
+mysql = ["mysqlclient (>=1.4.0,<2)", "mysqlclient (>=1.4.0)"]
+mysql_connector = ["mysql-connector-python"]
+oracle = ["cx_oracle (>=7,<8)", "cx_oracle (>=7)"]
+postgresql = ["psycopg2 (>=2.7)"]
+postgresql_asyncpg = ["greenlet (!=0.4.17)", "asyncpg"]
+postgresql_pg8000 = ["pg8000 (>=1.16.6,!=1.29.0)"]
+postgresql_psycopg2binary = ["psycopg2-binary"]
+postgresql_psycopg2cffi = ["psycopg2cffi"]
+pymysql = ["pymysql (<1)", "pymysql"]
+sqlcipher = ["sqlcipher3-binary"]
+
+[metadata]
+lock-version = "1.1"
+python-versions = "^3.9"
+content-hash = "71adce56adcb305f2ef3cc061eac771ccf05072b8d864d26e8cb2369ab639ee6"
+
+[metadata.files]
+greenlet = []
+lxml = []
+numpy = []
+psims = []
+pyteomics = [
+    {file = "pyteomics-4.5.3-py2.py3-none-any.whl", hash = "sha256:2c61e53ccfb393ed4237f2e11cdaee663d86cbab2688fad5ccc869c52b2b2b6c"},
+    {file = "pyteomics-4.5.3.tar.gz", hash = "sha256:066528ef9a0b2a0eb2f47beb3e2a7e920f91f464e7397b058a5fa2a8482d175b"},
+]
+six = [
+    {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
+    {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
+]
+sqlalchemy = []
