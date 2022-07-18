@@ -1,5 +1,10 @@
 # SIMSALABIM: Simple Interface for MS Applications
 
+[![PyPI version](https://img.shields.io/pypi/v/simsalabim.svg?logo=pypi&logoColor=FFE873)](https://pypi.org/project/simsalabim/)
+[![Supported Python versions](https://img.shields.io/pypi/pyversions/simsalabim.svg?logo=python&logoColor=FFE873)](https://pypi.org/project/simsalabim/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/simsalabim.svg)](https://pypistats.org/packages/simsalabim)
+
+
 ## Installation
 
 ### With ``pip``

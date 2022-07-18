@@ -1,9 +1,16 @@
 [tool.poetry]
 name = "simsalabim"
 version = "0.2.0"
-description = ""
+description = "Simple Interface for MS Applications"
 authors = ["Matthew The <matthew.the@tum.de>"]
-license = "Apache License 2.0"
+license= "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/kusterlab/SIMSI-Transfer"
+repository = "https://github.com/kusterlab/SIMSI-Transfer"
+keywords = ["mass spectrometry", "proteomics"]
+include = [
+  "LICENSE"
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"

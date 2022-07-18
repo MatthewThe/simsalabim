@@ -1,2 +1,6 @@
+v0.2.0
+* Refactoring and adding apl (andromeda peak list) support
+* Switch to poetry for dependency management
+
 v0.01.0
 * Initial release
