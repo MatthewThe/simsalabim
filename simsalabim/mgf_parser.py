@@ -46,7 +46,7 @@ def parse_mgf(inputFile, storeFragmentIons = False):
         rtime = float(line.split('=')[1])
       elif line.startswith('PEPMASS'):
         fields = line.split('=')[1].split()
-        pepmass = float(fields[0])
+        pepmz = float(fields[0])
         intensity = None if len(fields) <= 1 else float(fields[1])
       elif line.startswith('CHARGE'):
         charge = int(line.split('=')[1][0])
@@ -54,7 +54,6 @@ def parse_mgf(inputFile, storeFragmentIons = False):
         fragmentIons.append(map(float, line.split()))
       elif line.startswith('END IONS'):
         if scannr != -1:
-          pepmz = helpers.precMzFromPrecMass(pepmass, charge)
           yield Spectrum(scannr, [{'mz': pepmz, 'charge': charge, 'intensity': intensity}], fragmentIons)
         fragmentIons = list() if storeFragmentIons else None
 

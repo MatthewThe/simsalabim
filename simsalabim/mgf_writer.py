@@ -28,14 +28,13 @@ class MgfWriter:
                 timescale = 60
             
             p = precursor_information[0]
-            fmass = helpers.precMassFromPrecMz(p['mz'], p['charge'])
             idx = helpers.getScanNr(id)
             self.mgf_writer.write("BEGIN IONS\n")
             self.mgf_writer.write("TITLE=%s\n" % id)
             if p['intensity']:
-                self.mgf_writer.write("PEPMASS=%f %f\n" % (fmass, p['intensity']))
+                self.mgf_writer.write("PEPMASS=%f %f\n" % (p['mz'], p['intensity']))
             else:
-                self.mgf_writer.write("PEPMASS=%f\n" % (fmass))
+                self.mgf_writer.write("PEPMASS=%f\n" % (p['mz']))
             if scan_start_time:
                 self.mgf_writer.write("RTINSECONDS=%f\n" % (scan_start_time['value']*timescale))
             self.mgf_writer.write("CHARGE=%d+\n" % (p['charge']))

@@ -17,6 +17,8 @@ python = "^3.9"
 psims = "^1.0.1"
 numpy = "^1.23.1"
 pyteomics = "^4.5.3"
+biosaur2 = "^0.2.1"
+mplcursors = "^0.5.1"
 
 [tool.poetry.dev-dependencies]
 
